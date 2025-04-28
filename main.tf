@@ -37,4 +37,30 @@ module "iam" {
     minimum_password_length = 8
     password_reuse_prevention = 3
     require_lowercase_characters = true
+   # policy_attachment_system_admins = {
+    #    group = "system_admins"
+    #   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+    #}
+    #policy_attachment_database_admins = {
+    #    group = "database_admins"
+    #    policy_arn = "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator"
+    #}       
+    #policy_attachment_read_only = {
+    #    group = "read_only"
+    #    policy_arn = "arn:aws:iam::aws:policy/job-function/ReadOnlyAccess"
+    #}
+    policy_attachments = {
+        system_admins = {
+            group = "system_admins"
+            policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+        }
+        database_admins = {
+            group = "database_admins"
+            policy_arn = "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator"
+        }
+        read_only = {
+            group = "read_only"
+            policy_arn = "arn:aws:iam::aws:policy/job-function/ReadOnlyAccess"
+        }
+    }
 }

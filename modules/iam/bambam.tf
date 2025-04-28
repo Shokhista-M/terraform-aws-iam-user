@@ -7,7 +7,7 @@ variable "groups" {
         "read_only" = ["read_only_1", "read_only_2", "read_only_3"]
     }
 }
-variable "minimum_password_lenght" {
+variable "minimum_password_length" {
     type = number
     description = "Minimum password length"
     default = 8
@@ -60,7 +60,7 @@ resource "aws_iam_user" "default" {
     name = each.value
 }
 resource "aws_iam_account_password_policy" "strict_policy" {
-    minimum_password_length       = var.minimum_password_lenght #8
+    minimum_password_length       = var.minimum_password_length #8
     require_lowercase_characters  = var.require_lowercase_characters #true
     require_numbers               = var.require_numbers #true
     require_uppercase_characters  = var.require_uppercase_characters #true
@@ -80,15 +80,48 @@ resource "aws_iam_group_membership" "default" {
     users = each.value
     group = aws_iam_group.default[each.key].name
 }
-resource "aws_iam_group_policy_attachment" "sysadmin_full_access" {
-    group = aws_iam_group.default["system_admins"].name
-    policy_arn = "arn:aws:iam:aws:policy/AdminstratorAccess"
+#variable "policy_attachment_system_admins" {
+#    type = object({
+#        group = string
+#        policy_arn = string
+#    })
+#    description = "Policy attachment for system admins"
+#}
+#variable "policy_attachment_database_admins" {
+#    type = object({
+#        group = string
+#        policy_arn = string
+#    })
+#    description = "Policy attachment for database admins"
+#}
+#variable "policy_attachment_read_only" {
+#    type = object({
+#        group = string
+#        policy_arn = string
+#    })
+#    description = "Policy attachment for read only"
+#}
+#resource "aws_iam_group_policy_attachment" "sysadmin_full_access" {
+#   group = var.policy_attechment_system_admins.group
+#  policy_arn = var.policy_attachment_system_admins.policy_arn
+#
+#resource "aws_iam_group_policy_attachment" "dbadmin_full_access" {
+#    group =var.policy_attachment_database_admins.group
+#    policy_arn = var.policy_attachment_database_admins.policy_arn
+#}
+#resource "aws_iam_group_policy_attachment" "read_only" {
+#    group = var.policy_attachment_read_only.group
+#    policy_arn = var.policy_attachment_read_only.policy_arn
+#}
+variable"policy_attachments" {
+    type = map(object({
+        group = string
+        policy_arn = string
+    }))
+    description = "Policy attachment for system admins"
 }
-resource "aws_iam_group_policy_attachment" "dbadmin_full_access" {
-    group = aws_iam_group.default["database_admins"].name
-    policy_arn = "arn:aws:iam:aws:policy/job-function/DatabaseAdminstrator"
-}
-resource "aws_iam_group_policy_attachment" "read_only" {
-    group = aws_iam_group.default["read_only"].name
-    policy_arn = "arn:aws:iam:aws:policy/AmazonMonitronFullAccess"
+resource "aws_iam_group_policy_attachment" "policy_attachment" {
+    for_each = var.policy_attachments
+    group = aws_iam_group.default[each.value.group].name
+    policy_arn = each.value.policy_arn
 }
